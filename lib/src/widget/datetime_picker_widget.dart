@@ -154,6 +154,12 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
   }
 
   @override
+  void initState() {
+    _changeMinuteSelection(0);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Material(
@@ -294,8 +300,14 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
             int value = valueRange.first + index;
 
             if (format.contains('m')) {
-              value = (minuteDivider! * index) +
-                  (valueRange.first - valueRange.first % 10);
+              int? added = 0;
+              int per10 = valueRange.first % 10;
+              if (per10 > _minuteDivider) {
+                added = 10;
+              }
+
+              value =
+                  (minuteDivider! * index) + (valueRange.first - per10 + added);
             }
 
             return _renderDatePickerItemComponent(value, format);
@@ -381,8 +393,13 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
 
   /// change the selection of minute picker
   void _changeMinuteSelection(int index) {
-    int value =
-        index * _minuteDivider + (_minuteRange.first - _minuteRange.first % 10);
+    int added = 0;
+    int per10 = _minuteRange.first % 10;
+    if (per10 > _minuteDivider) {
+      added = 10;
+    }
+    int value = index * _minuteDivider + (_minuteRange.first - per10 + added);
+    if (value == 60) value -= _minuteDivider;
 //    int value = _minuteRange.first + index;
     if (_currMinute != value) {
       _currMinute = value;
